@@ -12703,24 +12703,7 @@ exports.default = {
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _PostValidator = __webpack_require__(6);
-
-var _PostValidator2 = _interopRequireDefault(_PostValidator);
-
-var _easyRequests = __webpack_require__(43);
-
-var _easyRequests2 = _interopRequireDefault(_easyRequests);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } //
+//
 //
 //
 //
@@ -12799,34 +12782,31 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 //
 //
 
-var Post = function (_Service) {
-    _inherits(Post, _Service);
+// import PostValidator from '../validators/PostValidator.js'
+// import Service from 'easy-requests'
 
-    function Post() {
-        _classCallCheck(this, Post);
+// class Post extends Service
+// {
+//     constructor(){
+//         super();
+//     }
 
-        return _possibleConstructorReturn(this, (Post.__proto__ || Object.getPrototypeOf(Post)).call(this));
-    }
+//     nextPage(url){
+//         return new Promise((resolve, reject)=>{
+//             this
+//                 .http
+//                 .get(url)
+//                 .then(response =>{
+//                     resolve(response.data)
+//                 })
+//                 .catch(err=>{
+//                     reject(err)
+//                 })
+//         });
+//     }
+// }
 
-    _createClass(Post, [{
-        key: 'nextPage',
-        value: function nextPage(url) {
-            var _this2 = this;
-
-            return new Promise(function (resolve, reject) {
-                _this2.http.get(url).then(function (response) {
-                    resolve(response.data);
-                }).catch(function (err) {
-                    reject(err);
-                });
-            });
-        }
-    }]);
-
-    return Post;
-}(_easyRequests2.default);
-
-var PostService = new Post();
+// let PostService = new Post();
 
 exports.default = {
     data: function data() {
@@ -12863,38 +12843,44 @@ exports.default = {
         },
         movePage: function movePage(url) {
             var vm = this;
-            if (!url) throw "We have not received any url!";
 
-            var post_promise = PostService.nextPage(url);
-
-            post_promise.then(function (posts) {
-                vm.posts = posts.data;
-                vm.collection = posts;
-            }).catch(function (err) {
-                console.log("There was an error ", err);
+            axios.get(url).then(function (posts) {
+                vm.posts = posts.data.data;
+                vm.collection = posts.data;
             });
 
-            // axios.get(url)
-            // .then((posts)=>{
-            //     vm.posts = posts.data.data;
-            //     vm.collection = posts.data
-            // }) 
+            // if(!url) throw "We have not received any url!"
+
+            // let post_promise = PostService.nextPage(url);    
+
+            // post_promise.then((posts)=>{
+            //     vm.posts = posts.data;
+            //     vm.collection = posts
+            // })
+            // .catch(err =>{
+            //     console.log("There was an error ", err)
+            // })
         },
-        getPosts: async function getPosts() {
+
+        //async 
+        getPosts: function getPosts() {
             var params = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { page: 3 };
 
             var vm = this;
-            var posts = await PostService.get(params);
-            this.posts = posts.data;
-            this.collection = posts;
-            /* axios.get("posts", {params})
-             .then((posts)=>{
-                 vm.posts = posts.data.data;
-                 vm.collection = posts.data
-             })*/
+
+            axios.get("posts", { params: params }).then(function (posts) {
+                vm.posts = posts.data.data;
+                vm.collection = posts.data;
+            });
+
+            // let posts = await PostService.get(params);
+            // this.posts = posts.data;
+            // this.collection = posts
         },
         createPost: function createPost() {
             var vm = this;
+
+            //OPtion 1
 
             // let rules = {
             //    title : 'required',
@@ -12911,18 +12897,24 @@ exports.default = {
             //    return;
             // }
 
-            var validator = _PostValidator2.default.make(this.form);
 
-            this.errors = validator.messages;
+            //Option 2
 
-            if (validator.fails()) {
-                console.log(validator.messages);
-                return;
-            }
+            // let validator = PostValidator.make(this.form);
+
+            // this.errors = validator.messages;
+
+            // if(validator.fails()){
+            //     console.log(validator.messages)
+            //     return ;
+            // }
+
 
             axios.post("posts", this.form).then(function (new_post) {
                 vm.posts.push(new_post.data);
                 vm.reset();
+            }).catch(function (error) {
+                console.log("Error");
             });
         },
         deletePost: function deletePost(post) {
@@ -15396,223 +15388,7 @@ module.exports = function() {
 
 
 /***/ }),
-/* 43 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-/* 
- *	Easy requests |
- *	(c) 2017 by Cesar Santana 
- */
-
-var axios = __webpack_require__(9);
-var pluralize = __webpack_require__(47);
-
-var Service = function () {
-	/**
-  * Create a new instance.
-  *
-  */
-	function Service() {
-		_classCallCheck(this, Service);
-
-		this.http = axios;
-		this.config = {
-			origin: window.location.origin,
-			prefix: '',
-			endpoint: pluralize(this.getClassName()).toLowerCase()
-		};
-	}
-
-	/**
-  * Returns name of the constructor.
-  *
-  * @returns String
-  */
-
-	_createClass(Service, [{
-		key: 'getClassName',
-		value: function getClassName() {
-			return this.constructor.name;
-		}
-
-		/**
-   * Builds url.
-   *
-   * @returns String
-   */
-
-	}, {
-		key: 'buildUrl',
-		value: function buildUrl() {
-			var id = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
-
-			var prefix = this.config.prefix;
-			var origin = this.config.origin;
-			var endpoint = this.config.endpoint;
-
-			return this.sanitizeUrl(origin + "/" + prefix + "/" + endpoint + "/" + id + "/");
-		}
-
-		/**
-   * Remove duplicated slashes.
-   *
-   * @returns String
-   */
-
-	}, {
-		key: 'sanitizeUrl',
-		value: function sanitizeUrl(endpoint) {
-			return endpoint.replace(/([^:])(\/\/+)/g, '$1/');
-		}
-
-		/**
-   * Make GET request to determinated URL.
-   *
-   * @returns Promise
-   */
-
-	}, {
-		key: 'get',
-		value: function get() {
-			var _this = this;
-
-			var params = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-
-			var route = this.buildUrl();
-			var promise_request = new Promise(function (resolve, reject) {
-				_this.http.get(route, {
-					params: params
-				}).then(function (posts) {
-					resolve(posts.data);
-				}).catch(function (error) {
-					reject(error);
-				});
-			});
-
-			return promise_request;
-		}
-
-		/**
-   * Make POST request to determinated URL to create a resource.
-   *
-   * @returns Promise
-   */
-
-	}, {
-		key: 'create',
-		value: function create(data) {
-			var _this2 = this;
-
-			if (!data) {
-				throw "data is needed";
-				return;
-			}
-			var route = this.buildUrl();
-			var promise_request = new Promise(function (resolve, reject) {
-				_this2.http.post(route, data).then(function (data) {
-					resolve(data.data);
-				}).catch(function (err) {
-					reject(err);
-				});
-			});
-			return promise_request;
-		}
-
-		/**
-   * Make GET request to determinated URL to get a resource.
-   *
-   * @returns Promise
-   */
-
-	}, {
-		key: 'find',
-		value: function find(id) {
-			var _this3 = this;
-
-			var params = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-
-			if (!id) {
-				throw "ID is needed";
-				return;
-			}
-			var route = this.buildUrl(id);
-			var resource_promise = new Promise(function (resolve, reject) {
-				_this3.http.get(route, {
-					params: params
-				}).then(function (item) {
-					resolve(item.data);
-				}).catch(function (err) {
-					reject(err);
-				});
-			});
-
-			return resource_promise;
-		}
-
-		/**
-   * Make PUT request to determinated URL to update a resource.
-   *
-   * @returns Promise
-   */
-
-	}, {
-		key: 'update',
-		value: function update(id, data) {
-			var _this4 = this;
-
-			var endpoint = this.buildUrl(id);
-			var resource_promise = new Promise(function (resolve, reject) {
-				_this4.http.put(endpoint, data).then(function (data) {
-					resolve(data.data);
-				}).catch(function (err) {
-					reject(err);
-				});
-			});
-
-			return resource_promise;
-		}
-
-		/**
-   * Make DELETE request to determinated URL to delete a resource.
-   *
-   * @returns Promise
-   */
-
-	}, {
-		key: 'delete',
-		value: function _delete(id) {
-			var _this5 = this;
-
-			var endpoint = this.buildUrl(id);
-			var resource_promise = new Promise(function (resolve, reject) {
-				_this5.http.delete(endpoint).then(function (data) {
-					resolve(data.data); // Deberiamos definir las convenciones para cuando recibamos una collección
-				}).catch(function (err) {
-					reject(err);
-				});
-			});
-			return resource_promise;
-		}
-	}]);
-
-	return Service;
-}();
-
-exports.default = Service;
-
-
-/***/ }),
+/* 43 */,
 /* 44 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -32811,474 +32587,7 @@ exports.default = {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(19), __webpack_require__(54)(module)))
 
 /***/ }),
-/* 47 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* global define */
-
-(function (root, pluralize) {
-  /* istanbul ignore else */
-  if (true) {
-    // Node.
-    module.exports = pluralize();
-  } else if (typeof define === 'function' && define.amd) {
-    // AMD, registers as an anonymous module.
-    define(function () {
-      return pluralize();
-    });
-  } else {
-    // Browser global.
-    root.pluralize = pluralize();
-  }
-})(this, function () {
-  // Rule storage - pluralize and singularize need to be run sequentially,
-  // while other rules can be optimized using an object for instant lookups.
-  var pluralRules = [];
-  var singularRules = [];
-  var uncountables = {};
-  var irregularPlurals = {};
-  var irregularSingles = {};
-
-  /**
-   * Title case a string.
-   *
-   * @param  {string} str
-   * @return {string}
-   */
-  function toTitleCase (str) {
-    return str.charAt(0).toUpperCase() + str.substr(1).toLowerCase();
-  }
-
-  /**
-   * Sanitize a pluralization rule to a usable regular expression.
-   *
-   * @param  {(RegExp|string)} rule
-   * @return {RegExp}
-   */
-  function sanitizeRule (rule) {
-    if (typeof rule === 'string') {
-      return new RegExp('^' + rule + '$', 'i');
-    }
-
-    return rule;
-  }
-
-  /**
-   * Pass in a word token to produce a function that can replicate the case on
-   * another word.
-   *
-   * @param  {string}   word
-   * @param  {string}   token
-   * @return {Function}
-   */
-  function restoreCase (word, token) {
-    // Tokens are an exact match.
-    if (word === token) {
-      return token;
-    }
-
-    // Upper cased words. E.g. "HELLO".
-    if (word === word.toUpperCase()) {
-      return token.toUpperCase();
-    }
-
-    // Title cased words. E.g. "Title".
-    if (word[0] === word[0].toUpperCase()) {
-      return toTitleCase(token);
-    }
-
-    // Lower cased words. E.g. "test".
-    return token.toLowerCase();
-  }
-
-  /**
-   * Interpolate a regexp string.
-   *
-   * @param  {string} str
-   * @param  {Array}  args
-   * @return {string}
-   */
-  function interpolate (str, args) {
-    return str.replace(/\$(\d{1,2})/g, function (match, index) {
-      return args[index] || '';
-    });
-  }
-
-  /**
-   * Sanitize a word by passing in the word and sanitization rules.
-   *
-   * @param  {string}   token
-   * @param  {string}   word
-   * @param  {Array}    collection
-   * @return {string}
-   */
-  function sanitizeWord (token, word, collection) {
-    // Empty string or doesn't need fixing.
-    if (!token.length || uncountables.hasOwnProperty(token)) {
-      return word;
-    }
-
-    var len = collection.length;
-
-    // Iterate over the sanitization rules and use the first one to match.
-    while (len--) {
-      var rule = collection[len];
-
-      // If the rule passes, return the replacement.
-      if (rule[0].test(word)) {
-        return word.replace(rule[0], function (match, index, word) {
-          var result = interpolate(rule[1], arguments);
-
-          if (match === '') {
-            return restoreCase(word[index - 1], result);
-          }
-
-          return restoreCase(match, result);
-        });
-      }
-    }
-
-    return word;
-  }
-
-  /**
-   * Replace a word with the updated word.
-   *
-   * @param  {Object}   replaceMap
-   * @param  {Object}   keepMap
-   * @param  {Array}    rules
-   * @return {Function}
-   */
-  function replaceWord (replaceMap, keepMap, rules) {
-    return function (word) {
-      // Get the correct token and case restoration functions.
-      var token = word.toLowerCase();
-
-      // Check against the keep object map.
-      if (keepMap.hasOwnProperty(token)) {
-        return restoreCase(word, token);
-      }
-
-      // Check against the replacement map for a direct word replacement.
-      if (replaceMap.hasOwnProperty(token)) {
-        return restoreCase(word, replaceMap[token]);
-      }
-
-      // Run all the rules against the word.
-      return sanitizeWord(token, word, rules);
-    };
-  }
-
-  /**
-   * Pluralize or singularize a word based on the passed in count.
-   *
-   * @param  {string}  word
-   * @param  {number}  count
-   * @param  {boolean} inclusive
-   * @return {string}
-   */
-  function pluralize (word, count, inclusive) {
-    var pluralized = count === 1
-      ? pluralize.singular(word) : pluralize.plural(word);
-
-    return (inclusive ? count + ' ' : '') + pluralized;
-  }
-
-  /**
-   * Pluralize a word.
-   *
-   * @type {Function}
-   */
-  pluralize.plural = replaceWord(
-    irregularSingles, irregularPlurals, pluralRules
-  );
-
-  /**
-   * Singularize a word.
-   *
-   * @type {Function}
-   */
-  pluralize.singular = replaceWord(
-    irregularPlurals, irregularSingles, singularRules
-  );
-
-  /**
-   * Add a pluralization rule to the collection.
-   *
-   * @param {(string|RegExp)} rule
-   * @param {string}          replacement
-   */
-  pluralize.addPluralRule = function (rule, replacement) {
-    pluralRules.push([sanitizeRule(rule), replacement]);
-  };
-
-  /**
-   * Add a singularization rule to the collection.
-   *
-   * @param {(string|RegExp)} rule
-   * @param {string}          replacement
-   */
-  pluralize.addSingularRule = function (rule, replacement) {
-    singularRules.push([sanitizeRule(rule), replacement]);
-  };
-
-  /**
-   * Add an uncountable word rule.
-   *
-   * @param {(string|RegExp)} word
-   */
-  pluralize.addUncountableRule = function (word) {
-    if (typeof word === 'string') {
-      uncountables[word.toLowerCase()] = true;
-      return;
-    }
-
-    // Set singular and plural references for the word.
-    pluralize.addPluralRule(word, '$0');
-    pluralize.addSingularRule(word, '$0');
-  };
-
-  /**
-   * Add an irregular word definition.
-   *
-   * @param {string} single
-   * @param {string} plural
-   */
-  pluralize.addIrregularRule = function (single, plural) {
-    plural = plural.toLowerCase();
-    single = single.toLowerCase();
-
-    irregularSingles[single] = plural;
-    irregularPlurals[plural] = single;
-  };
-
-  /**
-   * Irregular rules.
-   */
-  [
-    // Pronouns.
-    ['I', 'we'],
-    ['me', 'us'],
-    ['he', 'they'],
-    ['she', 'they'],
-    ['them', 'them'],
-    ['myself', 'ourselves'],
-    ['yourself', 'yourselves'],
-    ['itself', 'themselves'],
-    ['herself', 'themselves'],
-    ['himself', 'themselves'],
-    ['themself', 'themselves'],
-    ['is', 'are'],
-    ['was', 'were'],
-    ['has', 'have'],
-    ['this', 'these'],
-    ['that', 'those'],
-    // Words ending in with a consonant and `o`.
-    ['echo', 'echoes'],
-    ['dingo', 'dingoes'],
-    ['volcano', 'volcanoes'],
-    ['tornado', 'tornadoes'],
-    ['torpedo', 'torpedoes'],
-    // Ends with `us`.
-    ['genus', 'genera'],
-    ['viscus', 'viscera'],
-    // Ends with `ma`.
-    ['stigma', 'stigmata'],
-    ['stoma', 'stomata'],
-    ['dogma', 'dogmata'],
-    ['lemma', 'lemmata'],
-    ['schema', 'schemata'],
-    ['anathema', 'anathemata'],
-    // Other irregular rules.
-    ['ox', 'oxen'],
-    ['axe', 'axes'],
-    ['die', 'dice'],
-    ['yes', 'yeses'],
-    ['foot', 'feet'],
-    ['eave', 'eaves'],
-    ['goose', 'geese'],
-    ['tooth', 'teeth'],
-    ['quiz', 'quizzes'],
-    ['human', 'humans'],
-    ['proof', 'proofs'],
-    ['carve', 'carves'],
-    ['valve', 'valves'],
-    ['looey', 'looies'],
-    ['thief', 'thieves'],
-    ['groove', 'grooves'],
-    ['pickaxe', 'pickaxes'],
-    ['whiskey', 'whiskies']
-  ].forEach(function (rule) {
-    return pluralize.addIrregularRule(rule[0], rule[1]);
-  });
-
-  /**
-   * Pluralization rules.
-   */
-  [
-    [/s?$/i, 's'],
-    [/[^\u0000-\u007F]$/i, '$0'],
-    [/([^aeiou]ese)$/i, '$1'],
-    [/(ax|test)is$/i, '$1es'],
-    [/(alias|[^aou]us|tlas|gas|ris)$/i, '$1es'],
-    [/(e[mn]u)s?$/i, '$1s'],
-    [/([^l]ias|[aeiou]las|[emjzr]as|[iu]am)$/i, '$1'],
-    [/(alumn|syllab|octop|vir|radi|nucle|fung|cact|stimul|termin|bacill|foc|uter|loc|strat)(?:us|i)$/i, '$1i'],
-    [/(alumn|alg|vertebr)(?:a|ae)$/i, '$1ae'],
-    [/(seraph|cherub)(?:im)?$/i, '$1im'],
-    [/(her|at|gr)o$/i, '$1oes'],
-    [/(agend|addend|millenni|dat|extrem|bacteri|desiderat|strat|candelabr|errat|ov|symposi|curricul|automat|quor)(?:a|um)$/i, '$1a'],
-    [/(apheli|hyperbat|periheli|asyndet|noumen|phenomen|criteri|organ|prolegomen|hedr|automat)(?:a|on)$/i, '$1a'],
-    [/sis$/i, 'ses'],
-    [/(?:(kni|wi|li)fe|(ar|l|ea|eo|oa|hoo)f)$/i, '$1$2ves'],
-    [/([^aeiouy]|qu)y$/i, '$1ies'],
-    [/([^ch][ieo][ln])ey$/i, '$1ies'],
-    [/(x|ch|ss|sh|zz)$/i, '$1es'],
-    [/(matr|cod|mur|sil|vert|ind|append)(?:ix|ex)$/i, '$1ices'],
-    [/(m|l)(?:ice|ouse)$/i, '$1ice'],
-    [/(pe)(?:rson|ople)$/i, '$1ople'],
-    [/(child)(?:ren)?$/i, '$1ren'],
-    [/eaux$/i, '$0'],
-    [/m[ae]n$/i, 'men'],
-    ['thou', 'you']
-  ].forEach(function (rule) {
-    return pluralize.addPluralRule(rule[0], rule[1]);
-  });
-
-  /**
-   * Singularization rules.
-   */
-  [
-    [/s$/i, ''],
-    [/(ss)$/i, '$1'],
-    [/((a)naly|(b)a|(d)iagno|(p)arenthe|(p)rogno|(s)ynop|(t)he)(?:sis|ses)$/i, '$1sis'],
-    [/(^analy)(?:sis|ses)$/i, '$1sis'],
-    [/(wi|kni|(?:after|half|high|low|mid|non|night|[^\w]|^)li)ves$/i, '$1fe'],
-    [/(ar|(?:wo|[ae])l|[eo][ao])ves$/i, '$1f'],
-    [/ies$/i, 'y'],
-    [/\b([pl]|zomb|(?:neck|cross)?t|coll|faer|food|gen|goon|group|lass|talk|goal|cut)ies$/i, '$1ie'],
-    [/\b(mon|smil)ies$/i, '$1ey'],
-    [/(m|l)ice$/i, '$1ouse'],
-    [/(seraph|cherub)im$/i, '$1'],
-    [/(x|ch|ss|sh|zz|tto|go|cho|alias|[^aou]us|tlas|gas|(?:her|at|gr)o|ris)(?:es)?$/i, '$1'],
-    [/(e[mn]u)s?$/i, '$1'],
-    [/(movie|twelve)s$/i, '$1'],
-    [/(cris|test|diagnos)(?:is|es)$/i, '$1is'],
-    [/(alumn|syllab|octop|vir|radi|nucle|fung|cact|stimul|termin|bacill|foc|uter|loc|strat)(?:us|i)$/i, '$1us'],
-    [/(agend|addend|millenni|dat|extrem|bacteri|desiderat|strat|candelabr|errat|ov|symposi|curricul|quor)a$/i, '$1um'],
-    [/(apheli|hyperbat|periheli|asyndet|noumen|phenomen|criteri|organ|prolegomen|hedr|automat)a$/i, '$1on'],
-    [/(alumn|alg|vertebr)ae$/i, '$1a'],
-    [/(cod|mur|sil|vert|ind)ices$/i, '$1ex'],
-    [/(matr|append)ices$/i, '$1ix'],
-    [/(pe)(rson|ople)$/i, '$1rson'],
-    [/(child)ren$/i, '$1'],
-    [/(eau)x?$/i, '$1'],
-    [/men$/i, 'man']
-  ].forEach(function (rule) {
-    return pluralize.addSingularRule(rule[0], rule[1]);
-  });
-
-  /**
-   * Uncountable rules.
-   */
-  [
-    // Singular words with no plurals.
-    'advice',
-    'adulthood',
-    'agenda',
-    'aid',
-    'alcohol',
-    'ammo',
-    'athletics',
-    'bison',
-    'blood',
-    'bream',
-    'buffalo',
-    'butter',
-    'carp',
-    'cash',
-    'chassis',
-    'chess',
-    'clothing',
-    'commerce',
-    'cod',
-    'cooperation',
-    'corps',
-    'digestion',
-    'debris',
-    'diabetes',
-    'energy',
-    'equipment',
-    'elk',
-    'excretion',
-    'expertise',
-    'flounder',
-    'fun',
-    'gallows',
-    'garbage',
-    'graffiti',
-    'headquarters',
-    'health',
-    'herpes',
-    'highjinks',
-    'homework',
-    'housework',
-    'information',
-    'jeans',
-    'justice',
-    'kudos',
-    'labour',
-    'literature',
-    'machinery',
-    'mackerel',
-    'mail',
-    'media',
-    'mews',
-    'moose',
-    'music',
-    'news',
-    'pike',
-    'plankton',
-    'pliers',
-    'pollution',
-    'premises',
-    'rain',
-    'research',
-    'rice',
-    'salmon',
-    'scissors',
-    'series',
-    'sewage',
-    'shambles',
-    'shrimp',
-    'species',
-    'staff',
-    'swine',
-    'trout',
-    'traffic',
-    'transporation',
-    'tuna',
-    'wealth',
-    'welfare',
-    'whiting',
-    'wildebeest',
-    'wildlife',
-    'you',
-    // Regexes.
-    /pox$/i, // "chickpox", "smallpox"
-    /ois$/i,
-    /deer$/i, // "deer", "reindeer"
-    /fish$/i, // "fish", "blowfish", "angelfish"
-    /sheep$/i,
-    /measles$/i,
-    /[^aeiou]ese$/i // "chinese", "japanese"
-  ].forEach(pluralize.addUncountableRule);
-
-  return pluralize;
-});
-
-
-/***/ }),
+/* 47 */,
 /* 48 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -33342,11 +32651,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
         _vm.form.title = $event.target.value
       }
     }
-  }), _vm._v(" "), (_vm.errors.title.length > 0) ? _c('span', {
-    staticClass: "red"
-  }, _vm._l((_vm.errors.title), function(error) {
-    return _c('small', [_vm._v("\n                    " + _vm._s(error) + "\n                    "), _c('br')])
-  })) : _vm._e()]), _vm._v(" "), _c('div', {
+  })]), _vm._v(" "), _c('div', {
     staticClass: "form-group",
     class: {
       'has-error': _vm.errors.description.length > 0
@@ -33378,11 +32683,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
         _vm.form.description = $event.target.value
       }
     }
-  }), _vm._v(" "), (_vm.errors.description.length > 0) ? _c('span', {
-    staticClass: "red"
-  }, _vm._l((_vm.errors.description), function(error) {
-    return _c('small', [_vm._v("\n                    " + _vm._s(error) + "\n                    "), _c('br')])
-  })) : _vm._e()]), _vm._v(" "), _c('div', {
+  })]), _vm._v(" "), _c('div', {
     staticClass: "form-group"
   }, [_c('div', {
     staticClass: "checkbox"

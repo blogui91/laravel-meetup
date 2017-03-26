@@ -23,23 +23,23 @@
             
             <label for="input-title">Título</label>
             <input type="text" class="form-control" id="input-title" v-model="form.title" placeholder="Escribe un título">
-            <span class="red" v-if="errors.title.length>0">
+            <!-- <span class="red" v-if="errors.title.length>0">
                 <small v-for="error in errors.title">
                     {{error}}
                     <br>
                 </small>
-            </span>
+            </span> -->
         </div>
         <div class="form-group" :class="{'has-error' : errors.description.length>0 }">
             
             <label for="input-description">Descripción</label>
             <textarea name=""class="form-control"  id="" cols="30" rows="10" v-model="form.description"></textarea>
-            <span class="red" v-if="errors.description.length>0">
+            <!-- <span class="red" v-if="errors.description.length>0">
                 <small v-for="error in errors.description">
                     {{error}}
                     <br>
                 </small>
-            </span>
+            </span> -->
         </div>
         <div class="form-group">
             <div class="checkbox">
@@ -77,31 +77,31 @@
 	</div>
 </template>
 <script>
-import PostValidator from '../validators/PostValidator.js'
-import Service from 'easy-requests'
+// import PostValidator from '../validators/PostValidator.js'
+// import Service from 'easy-requests'
 
-class Post extends Service
-{
-    constructor(){
-        super();
-    }
+// class Post extends Service
+// {
+//     constructor(){
+//         super();
+//     }
 
-    nextPage(url){
-        return new Promise((resolve, reject)=>{
-            this
-                .http
-                .get(url)
-                .then(response =>{
-                    resolve(response.data)
-                })
-                .catch(err=>{
-                    reject(err)
-                })
-        });
-    }
-}
+//     nextPage(url){
+//         return new Promise((resolve, reject)=>{
+//             this
+//                 .http
+//                 .get(url)
+//                 .then(response =>{
+//                     resolve(response.data)
+//                 })
+//                 .catch(err=>{
+//                     reject(err)
+//                 })
+//         });
+//     }
+// }
 
-let PostService = new Post();
+// let PostService = new Post();
 
   export default {
     data() {
@@ -137,37 +137,43 @@ let PostService = new Post();
         },
         movePage(url){
             let vm = this;
-            if(!url) throw "We have not received any url!"
 
-            let post_promise = PostService.nextPage(url);    
-
-            post_promise.then((posts)=>{
-                vm.posts = posts.data;
-                vm.collection = posts
-            })
-            .catch(err =>{
-                console.log("There was an error ", err)
-            })
-
-            // axios.get(url)
-            // .then((posts)=>{
-            //     vm.posts = posts.data.data;
-            //     vm.collection = posts.data
-            // }) 
-        },
-        async getPosts(params = { page : 3 }){
-            var vm = this;
-            let posts = await PostService.get(params);
-            this.posts = posts.data;
-            this.collection = posts
-           /* axios.get("posts", {params})
+            axios.get(url)
             .then((posts)=>{
                 vm.posts = posts.data.data;
                 vm.collection = posts.data
-            })*/
+            })
+
+            // if(!url) throw "We have not received any url!"
+
+            // let post_promise = PostService.nextPage(url);    
+
+            // post_promise.then((posts)=>{
+            //     vm.posts = posts.data;
+            //     vm.collection = posts
+            // })
+            // .catch(err =>{
+            //     console.log("There was an error ", err)
+            // })
+        },
+        //async 
+        getPosts(params = { page : 3 }){
+            let vm = this;
+            
+            axios.get("posts", {params})
+            .then((posts)=>{
+                vm.posts = posts.data.data;
+                vm.collection = posts.data
+            })
+
+            // let posts = await PostService.get(params);
+            // this.posts = posts.data;
+            // this.collection = posts
         },
       createPost(){
          let vm = this;
+
+         //OPtion 1
 
          // let rules = {
          //    title : 'required',
@@ -184,20 +190,25 @@ let PostService = new Post();
          //    return;
          // }
 
-         let validator = PostValidator.make(this.form);
 
-        this.errors = validator.messages;
+         //Option 2
 
-        if(validator.fails()){
-            console.log(validator.messages)
-            return ;
-        }
+        // let validator = PostValidator.make(this.form);
+
+        // this.errors = validator.messages;
+
+        // if(validator.fails()){
+        //     console.log(validator.messages)
+        //     return ;
+        // }
 
 
-         axios.post("posts", this.form).then((new_post)=>{
+        axios.post("posts", this.form).then((new_post)=>{
             vm.posts.push(new_post.data);
             vm.reset();
-         });
+        }).catch(error =>{
+            console.log("Error");
+        });
 
       },
       deletePost(post){
