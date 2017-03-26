@@ -23,6 +23,12 @@
             
             <label for="input-title">Título</label>
             <input type="text" class="form-control" id="input-title" v-model="form.title" placeholder="Escribe un título">
+            <span class="red" v-if="errors.title.length>0">
+                <small v-for="error in errors.title">
+                    {{error}}
+                    <br>
+                </small>
+            </span>
         </div>
         <div class="form-group" :class="{'has-error' : errors.description.length>0 }">
             
