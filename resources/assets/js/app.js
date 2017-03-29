@@ -6,19 +6,9 @@
 
 require('./bootstrap');
 
-import Validator from 'laravalidator-js'
-
-var validator = new Validator()
-
-validator.extend({
-	'even_numbers' (data) {
-		console.log(data)
-	}
-})
-
 //AutoInstall components
-import Components from './component.provider.js'
-Components.install(Vue);
+// import Components from './component.provider.js'
+// Components.install(Vue);
 
 
 /**

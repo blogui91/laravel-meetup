@@ -7,14 +7,13 @@ class PostValidator extends Validator {
 		this.data = data;
 
 		this.rules = {
-			title: 'required,odd',
+			title: 'required',
 			description: 'required'
 		}
 
 		this.messages = {
 			title: {
 				required: "El titulo es requerido!",
-				odd: "Escriba un numero impar"
 			},
 			description: {
 				required: "Escriba una descripción!"
